@@ -1,4 +1,4 @@
-# Local configuration and credentials
+# Never publish credentials, tokens, or machine-local config
 .env
 .env.*
 !.env.example
@@ -6,9 +6,23 @@
 *.key
 *.p12
 *.pfx
+*.jks
+*.keystore
 android/local.properties
+config.json
 
-# data/ is deny-by-default. Only shipped indexes may be committed.
+# Real NovelAI / DeepSeek / Pixiv files (examples also stay out of this repo)
+**/*.local.json
+**/nai_token*
+**/pixiv_accounts*
+**/ai.local.json
+data/cache/
+data/galleries/
+data/generated/
+data/images/
+data/user_prefs.json
+
+# data/ is deny-by-default. Only shipped public indexes may be committed.
 data/*
 !data/.gitkeep
 !data/ark_char_library.json
