@@ -542,7 +542,7 @@ final class FavoriteStore {
     private HttpOutbound.Result fetchImage(JSONObject image, String workId) throws Exception {
         String type = JsonUtil.str(image, "image_type");
         String author = JsonUtil.str(image, "author_id");
-        String file = JsonUtil.str(image, "image_name");
+        String file = JsonUtil.str(image, "file_name");
         if (!type.isEmpty() && !author.isEmpty() && !file.isEmpty()) {
             return aitag.image(type, author, file);
         }
