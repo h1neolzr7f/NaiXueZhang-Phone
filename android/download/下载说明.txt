@@ -21,7 +21,7 @@ Token 每行一个，几个就能并发几路。
 在线库不通时，先开「内置样例」。Clash 填 HTTP（例如 http://127.0.0.1:7890），不要只开全局 VPN。
 
 手机浏览器直接下载：
-https://github.com/h1neolzr7f/NaiXueZhang-Phone/raw/main/android/download/NaiXueZhang-Phone-1.5.2.apk
+https://github.com/h1neolzr7f/NaiXueZhang-Studio-Upgrade/raw/cursor/android-phone-standalone-9162/android/download/NaiXueZhang-Phone-1.5.2.apk
 
 公开源码仓库：
 https://github.com/h1neolzr7f/NaiXueZhang-Phone
