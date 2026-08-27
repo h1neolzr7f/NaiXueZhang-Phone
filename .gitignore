@@ -1,0 +1,62 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+android/local.properties
+
+# data/ is deny-by-default. Only shipped indexes may be committed.
+data/*
+!data/.gitkeep
+!data/ark_char_library.json
+!data/ark_cn_aliases.json
+!data/char_presets.json
+!data/char_tag_groups.json
+!data/char_tag_index.json
+!data/danbooru_creature.json
+!data/danbooru_style_tags.json
+!data/phone_char_index.txt
+!data/phone_copyright_index.txt
+!data/phone_series_aliases.json
+!data/phone_style_index.json
+!data/tag_dict.json
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+*~
+*.bak
+*.bak-*
+*.old
+*.orig
+
+# Logs and local databases
+*.log
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Build and tool state
+.gradle/
+android/.gradle/
+android/build/
+android/app/build/
+android/app/src/main/assets/www/
+android/app/src/main/assets/data/
+.pytest_cache/
+node_modules/
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Local scratch
+.tmp/
