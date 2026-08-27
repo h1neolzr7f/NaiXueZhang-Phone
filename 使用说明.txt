@@ -11,7 +11,7 @@
 
 下载安装
   1. 用手机浏览器打开：
-     https://github.com/h1neolzr7f/NaiXueZhang-Phone/raw/main/android/download/NaiXueZhang-Phone-1.5.2.apk
+     https://github.com/h1neolzr7f/NaiXueZhang-Studio-Upgrade/raw/cursor/android-phone-standalone-9162/android/download/NaiXueZhang-Phone-1.5.2.apk
   2. 等 APK 下完后打开。若系统拦截，到设置里允许「安装未知应用」。
   3. 先卸载旧的「Nai学长工作室」再装，避免签名冲突。
   4. 核验 SHA256：
@@ -19,6 +19,7 @@
 
 当前版本：1.5.2-phone.16（versionCode 167）
 只要 64 位 Android。这是 debug 签名包。
+公开源码：https://github.com/h1neolzr7f/NaiXueZhang-Phone
 
 钥匙
   · NovelAI Token：出图。每行一个，几个就能并发几路。
