@@ -444,8 +444,8 @@ final class JobStore {
         String lower = message.toLowerCase(java.util.Locale.ROOT);
         if (lower.contains("connection closed") || lower.contains("connection reset")
             || lower.contains("broken pipe") || lower.contains("unexpected end")
-            || lower.contains("failed to connect") || lower.contains("生成连接被挑断")) {
-            return "生成连接被挑断。没看到成功回执，先看 NovelAI 记录有没有扣费，再手动重试";
+            || lower.contains("failed to connect") || lower.contains("生成连接被掐断")) {
+            return "生成连接被掐断。没看到成功回执，先看 NovelAI 记录有没有扣费，再手动重试";
         }
         if ("missing_token".equals(message) || lower.contains("not configured")) {
             return "先在设置里填 NovelAI Token";
