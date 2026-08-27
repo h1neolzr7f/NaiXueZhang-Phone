@@ -11,16 +11,17 @@
 
 ## 直接下载 APK
 
-手机浏览器打开下面任一链接，等下载完成再安装：
+手机浏览器打开下面链接，等下载完成再安装：
 
-- [NaiXueZhang-Phone-1.5.2.apk](https://github.com/h1neolzr7f/NaiXueZhang-Phone/raw/main/android/download/NaiXueZhang-Phone-1.5.2.apk)
-- 备用（blob 页）：[android/download/NaiXueZhang-Phone-1.5.2.apk](https://github.com/h1neolzr7f/NaiXueZhang-Phone/blob/main/android/download/NaiXueZhang-Phone-1.5.2.apk)
+- [下载 NaiXueZhang-Phone-1.5.2.apk](https://github.com/h1neolzr7f/NaiXueZhang-Studio-Upgrade/raw/cursor/android-phone-standalone-9162/android/download/NaiXueZhang-Phone-1.5.2.apk)
 
-| 项目 | 值 |
-| --- | --- |
-| 文件 | `android/download/NaiXueZhang-Phone-1.5.2.apk` |
-| 大小 | 约 51MB |
-| SHA256 | `2a8c1adbe6b4b8c60bf711c6344779f68c76e33c638cd877c8bb6a3cbdcdc8ca` |
+|项目|值|
+|---|---|
+|文件|`NaiXueZhang-Phone-1.5.2.apk`|
+|大小|约 51MB|
+|版本|1.5.2-phone.16 / versionCode 167|
+|SHA256|`2a8c1adbe6b4b8c60bf711c6344779f68c76e33c638cd877c8bb6a3cbdcdc8ca`|
+|包名|`com.naixuezhang.studio.mobile`|
 
 装法：
 
@@ -38,7 +39,7 @@
 - 搜 AITag 在线库并收藏入库；在线挂了也能用内置样例
 - 收藏先收屏幕上的图和咒语，不用等原图下完
 - 收藏后咒语到了就能换角、换画风和生成
-- 本机打进电脑同款全量 D 站角色包（约 35 万角色）+ 明日方舟库 + OC（整段咒语，支持 `{{`权重`}}`）
+- 本机打进电脑同款全量 D 站角色包（约 35 万角色）+ 明日方舟库 + OC（整段咒语，支持 `{{` 权重 `}}`）
 - 换角方式摊开：本页换角、按槽位换、全部页换、整系列换角并入队
 - 多个 NovelAI Token 可并发出图；失败可手动重试或删除，5xx / `unknown` 不自动重试
 - 图库按生成任务分组；出图先入库，再按需超分 / 清元数据
@@ -66,39 +67,33 @@ NaiXueZhang-Phone/
 环境：JDK 17、Android SDK 34。在 `android/` 里：
 
 ```bash
-# 本机 SDK 路径写进 android/local.properties，不要提交这个文件
 echo "sdk.dir=/path/to/Android/sdk" > local.properties
 ./gradlew assembleDebug
-# 产物：android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 `assembleDebug` 会先跑 `syncPhoneAssets`：从 `web/` 和 `data/` 拷进 `android/app/src/main/assets/`。生成出来的 `www/` 和 `assets/data/` 不要提交。
 
-电脑上预览手机壳（不装 APK）：
+电脑上预览手机壳：
 
 ```bash
 python3 scripts/phone_preview_server.py
-# 浏览器打开 http://127.0.0.1:18797/m?standalone=1
+# http://127.0.0.1:18797/m?standalone=1
 ```
-
-测试：
 
 ```bash
 node tests/standalone_core_test.js
 python3 -m unittest tests.test_mobile_standalone
 ```
 
-改了 `web/m/` 之后，在完整工作室仓库里请跑 `python3 scripts/asset_versions.py`。本仓库只含手机壳，一般改完直接重打 APK 即可。
-
 ## 仓库关系
 
-| 仓库 | 用途 |
-| --- | --- |
-| [NaiXueZhang-Phone](https://github.com/h1neolzr7f/NaiXueZhang-Phone) | **本仓库**：安卓独立版源码 + 最新 APK |
-| [NaiXueZhang-Studio-Upgrade](https://github.com/h1neolzr7f/NaiXueZhang-Studio-Upgrade) | 电脑升级版主干；手机版最初在这里开发 |
-| [NaiXueZhang-Studio](https://github.com/h1neolzr7f/NaiXueZhang-Studio) | 电脑稳定版 / 一键包 |
+|仓库|用途|
+|---|---|
+|[NaiXueZhang-Phone](https://github.com/h1neolzr7f/NaiXueZhang-Phone)|本仓库：安卓独立版开源文档与源码|
+|[NaiXueZhang-Studio-Upgrade](https://github.com/h1neolzr7f/NaiXueZhang-Studio-Upgrade)|电脑升级版主干；当前 APK 也在这里发布|
+|[NaiXueZhang-Studio](https://github.com/h1neolzr7f/NaiXueZhang-Studio)|电脑稳定版 / 一键包|
 
-私人占位仓 `NaiXueZhang-Studio-Phone` 不是正式发布仓。请从本仓库下载。
+私人占位仓 `NaiXueZhang-Studio-Phone` 不是正式发布仓。
 
 ## 许可证与第三方
 
