@@ -1,60 +1,59 @@
-# Nai学长工作室 · 安卓独立版
+# Nai 学长工作室 · Android 独立版
 
-公开源码仓。装在手机上就能搜图、收藏、换角、出图。**不连电脑，不遥控 Windows 工作室**。非官方。
+[English](README_EN.md) · [APK 下载说明](https://github.com/h1neolzr7f/NaiXueZhang-Phone-APK) · [Windows 主线](https://github.com/h1neolzr7f/NaiXueZhang-Studio-Upgrade)
 
-当前发布：**1.5.2-phone.23**（`versionCode` 174）  
-电脑版基准：v1.5.2  
-包名：`com.naixuezhang.studio.mobile`  
-只要 **64 位 Android**（`arm64-v8a`）。debug 签名。
+这是手机端的公开源码快照。应用在 Android 设备本地运行，通过内置 loopback 服务提供界面，不连接或遥控 Windows 工作室。
 
-本仓库与 pixiv、NovelAI（Anlatan）、DeepSeek、AITag **没有隶属或合作关系**。使用前请阅读 [LICENSE](LICENSE)、[DISCLAIMER.md](DISCLAIMER.md)、[RESPONSIBLE_USE.md](RESPONSIBLE_USE.md)。
+> **版本说明**：公开源码默认分支的 Android 配置是 `1.5.2-phone.16`（`versionCode 167`）；当前分发 APK 是 `1.5.2-phone.23`（`versionCode 174`）。两者不能当作同一个可复现构建。后续同步完成前，请以源码中的 Gradle 配置判断代码版本，以 APK 仓库的 SHA-256 判断安装包版本。
 
-## 直接下载 APK
+## 能做什么
 
-请到专用下载仓，不用登录 GitHub：
+- 在线发现与本地收藏分开，已收藏内容可在离线时查看和管理；
+- 从 NovelAI 元数据中整理 Prompt 与角色槽，建立换角草稿；
+- 本地生成队列保留免费档约束、失败状态和并发设置；
+- 可选的超分、元数据处理和打码流程；
+- Android Keystore 保存使用者在设备上填写的凭据。
 
-**[打开 NaiXueZhang-Phone-APK](https://github.com/h1neolzr7f/NaiXueZhang-Phone-APK)**
+第三方在线服务可能要求人机验证或临时不可用。应用不会因此获得绕过访问控制的权利，使用者仍需遵守服务条款和第三方权利要求。
 
-直链（约 72 小时有效）：https://litter.catbox.moe/mukoxq.apk
+## 源码结构
 
-|项目|值|
+```text
+android/   Android WebView 容器、本地 HTTP 服务、任务与凭据存储
+web/m/     手机界面与纯 JavaScript Prompt/换角逻辑
+data/      可公开的角色和标签索引子集
+tests/     JavaScript 与 Android 源码契约
+```
+
+当前公开快照不包含签名文件、真实凭据、用户数据，也不包含发行包中的全部大型运行资源。它适合代码审阅和契约测试；不能据此声称可逐字节复现 phone.23 APK。
+
+## 验证
+
+CI 的公开源码档位运行：
+
+```bash
+node tests/standalone_core_test.js
+python3 tests/test_mobile_standalone.py
+```
+
+不需要真实 NovelAI Token，也不会调用付费生成。只在发行工作区存在的大型索引、模型和预览工具会被明确跳过；APK 发布前还需在 Android 构建环境做完整验证。
+
+## 安装包
+
+分发说明与校验值在 [NaiXueZhang-Phone-APK](https://github.com/h1neolzr7f/NaiXueZhang-Phone-APK)。当前 phone.23 APK：
+
+| 项目 | 值 |
 |---|---|
-|文件|`NaiXueZhang-Phone-1.5.2.apk`|
-|大小|约 51MB|
-|版本|1.5.2-phone.23 / versionCode 174|
-|SHA256|`213ddd93005a70284c05d3e978734d13cd086d492d6f3fa6ae9ed2f5b19e9095`|
-|包名|`com.naixuezhang.studio.mobile`|
+| 包名 | `com.naixuezhang.studio.mobile` |
+| ABI | `arm64-v8a` |
+| 文件大小 | 52,819,220 bytes |
+| SHA-256 | `213ddd93005a70284c05d3e978734d13cd086d492d6f3fa6ae9ed2f5b19e9095` |
+| 签名 | debug；升级通常需要先卸载旧版 |
 
-装法：先卸旧版，手机浏览器打开直链，允许「安装未知应用」。
+临时镜像会过期。长期分发应迁移到带固定资产和校验值的 GitHub Release。
 
-## 这版要记住的
+## 安全与许可
 
-- **换角页能选模型和参数。** 跟电脑工作台一样：V4.5/V4/V3、尺寸、步数、CFG、采样器、免费档。默认跟随原图。
-- **本地库真正写进手机。** 本地搜和在线搜分开，断网也能打开、改名、删除。
-- **在线库打不开，不会再把你锁进内置样例。** 样例可选。
-- **打开更快。**
-- **接口被 Cloudflare 拦时仍能入库：** 点「网页打开在线库」在官网里搜、收藏；也可粘贴 `https://aitag.win/i/作品号`。
-- 设置里可选自动 / 官网 / 自己的 https 镜像。
-- `aitag.win` 今天仍可能要过人机，图床可能 521。不是安装包坏了。
+不要在 Issue、日志或截图中提交 NovelAI Token、第三方 API Key、Cookie、签名文件或私人图库。详见 [SECURITY.md](SECURITY.md)、[RESPONSIBLE_USE.md](RESPONSIBLE_USE.md) 和 [DISCLAIMER.md](DISCLAIMER.md)。
 
-## 小白三步
-
-1. 设置里填 NovelAI Token 和 DeepSeek Key。Token 每行一个，几个就能并发几路。
-2. 「发现」里搜图并点☆收藏。接口不行就用网页库或粘贴链接。
-3. 本地库选人、看画风，需要时改模型和参数，点「整系列换角并入队」。
-
-不要只开全局 VPN / TUN。Clash 填 HTTP，例如 `http://127.0.0.1:7890`。出图默认直连。
-
-## 仓库关系
-
-|仓库|用途|
-|---|---|
-|[NaiXueZhang-Phone](https://github.com/h1neolzr7f/NaiXueZhang-Phone)|本仓库：安卓独立版公开说明|
-|[NaiXueZhang-Phone-APK](https://github.com/h1neolzr7f/NaiXueZhang-Phone-APK)|安装包直链|
-|[NaiXueZhang-Studio-Upgrade](https://github.com/h1neolzr7f/NaiXueZhang-Studio-Upgrade)|电脑主线|
-
-私人开发仓 `NaiXueZhang-Studio-Phone` 的代码已升到 phone.23；`cursor[bot]` 不能直接推公开源码仓的 main，完整源码同步需你本机 `git push`。
-
-## 许可证
-
-源码 [MIT License](LICENSE)。Token 只写进手机，不要把真实 Token 交进 Git。
+代码采用 [MIT License](LICENSE)。项目与 pixiv Inc.、NovelAI/Anlatan、AITag、DeepSeek 或其他第三方服务没有隶属、授权或合作关系。

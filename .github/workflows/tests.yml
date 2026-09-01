@@ -19,4 +19,4 @@ jobs:
       - name: Phone shell contract
         run: node tests/standalone_core_test.js
       - name: Android standalone contract
-        run: python3 -m unittest tests.test_mobile_standalone
+        run: python3 tests/test_mobile_standalone.py
