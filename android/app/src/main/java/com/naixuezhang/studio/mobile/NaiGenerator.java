@@ -26,9 +26,14 @@ final class NaiGenerator {
     }
 
     byte[] generatePng(JSONObject comment, boolean forceFree) throws Exception {
+        return generatePng(comment, forceFree, () -> false);
+    }
+
+    byte[] generatePng(JSONObject comment, boolean forceFree, java.util.function.BooleanSupplier cancelled) throws Exception {
         String token = tokens.lease(180000);
-        if (token.isEmpty()) throw new IllegalStateException("missing_token");
+        if (token.isEmpty()) throw new NaiError("missing_token", false, "provider_unavailable");
         try {
+            if (cancelled.getAsBoolean()) throw new NaiError("任务已取消，未发送请求", false, "cancelled");
             return generatePngWith(token, comment, forceFree);
         } finally {
             tokens.release(token);
@@ -211,3 +216,4 @@ final class NaiGenerator {
         }
     }
 }
+

@@ -213,7 +213,7 @@ final class LocalStudioServer implements LocalHttpServer.Handler {
         if ("POST".equals(request.method) && path.startsWith("/api/mobile/queue/") && path.endsWith("/retry")) {
             String taskId = LocalHttpServer.decode(path.substring("/api/mobile/queue/".length(), path.length() - "/retry".length()));
             try {
-                return json(200, jobs.retry(taskId).toString());
+                return json(200, jobs.retry(taskId, JsonUtil.obj(request.text()).optBoolean("retry_unknown", false)).toString());
             } catch (Exception error) {
                 return json(400, errorJson(error.getMessage()));
             }
@@ -475,3 +475,4 @@ final class LocalStudioServer implements LocalHttpServer.Handler {
         return data;
     }
 }
+

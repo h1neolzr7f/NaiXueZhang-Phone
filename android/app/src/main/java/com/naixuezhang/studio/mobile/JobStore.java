@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 final class JobStore {
     private final Map<String, JSONObject> jobs = new ConcurrentHashMap<>();
+    private final Map<String, RetryLedger> ledgers = new ConcurrentHashMap<>();
     private final Map<String, JSONObject> payloads = new ConcurrentHashMap<>();
     private final Set<String> cancelled = ConcurrentHashMap.newKeySet();
     private final List<String> order = new ArrayList<>();
@@ -79,6 +80,11 @@ final class JobStore {
                 units.add(unit);
             }
         }
+        return enqueueUnits(units, storedPages, forceFree, copiesEach, meta);
+    }
+
+    private JSONObject enqueueUnits(List<JSONObject> units, JSONArray storedPages,
+            boolean forceFree, int copiesEach, JSONObject meta) throws Exception {
         if (units.isEmpty()) throw new IllegalArgumentException("没有可生成的页");
         if (units.size() > 40) throw new IllegalArgumentException("一次最多 40 张，先少选几页或少填张数");
         String id = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
@@ -110,11 +116,13 @@ final class JobStore {
             attachEta(job, units.size(), generator.concurrency(), 0);
         }
         jobs.put(id, job);
+        ledgers.put(id, new RetryLedger(units.size()));
         JSONObject stored = new JSONObject();
         stored.put("comment", storedPages.optJSONObject(0) == null
             ? new JSONObject()
             : storedPages.optJSONObject(0).optJSONObject("comment"));
         stored.put("pages", storedPages);
+        stored.put("units", new JSONArray(units));
         stored.put("force_free", forceFree);
         stored.put("copies", copiesEach);
         stored.put("source", source == null ? new JSONObject() : new JSONObject(source.toString()));
@@ -125,6 +133,7 @@ final class JobStore {
                 String old = order.remove(order.size() - 1);
                 jobs.remove(old);
                 payloads.remove(old);
+                ledgers.remove(old);
                 cancelled.remove(old);
             }
         }
@@ -163,6 +172,8 @@ final class JobStore {
             try {
                 JSONObject copy = new JSONObject(job.toString());
                 decorateLive(copy);
+                RetryLedger ledger = ledgers.get(taskId);
+                copy.put("billing_uncertain", ledger != null && ledger.hasUnknown());
                 return copy;
             } catch (Exception e) {
                 return job;
@@ -219,31 +230,63 @@ final class JobStore {
     }
 
     JSONObject retry(String taskId) throws Exception {
+        return retry(taskId, false);
+    }
+
+    JSONObject retry(String taskId, boolean retryUnknown) throws Exception {
         String id = String.valueOf(taskId == null ? "" : taskId).trim();
         JSONObject job = jobs.get(id);
         JSONObject stored = payloads.get(id);
-        if (job == null || stored == null) throw new IllegalArgumentException("没有可重试的任务");
-        String status = "";
+        RetryLedger ledger = ledgers.get(id);
+        if (job == null || stored == null || ledger == null) throw new IllegalArgumentException("没有可重试的任务");
+        List<JSONObject> selected = new ArrayList<>();
+        JSONArray pages = new JSONArray();
         synchronized (job) {
-            status = job.optString("status");
-            if (!"error".equals(status) && !"unknown".equals(status) && !"cancelled".equals(status)) {
-                throw new IllegalStateException("只有失败、取消或结果不明的任务才能重试");
+            // Repeated taps on the same parent must return the same child job.
+            String child = job.optString("retry_task_id");
+            if (!child.isEmpty()) {
+                JSONObject existing = get(child);
+                if (existing == null) throw new IllegalStateException("补做任务已移除，请在图库中核对结果");
+                existing.put("ok", true);
+                return existing;
             }
+            if (job.optBoolean("retry_in_progress")) throw new IllegalStateException("正在创建补做任务，请稍候");
+            String status = job.optString("status");
+            if (!job.optBoolean("terminal") || job.optInt("running") > 0
+                    || (!"error".equals(status) && !"unknown".equals(status) && !"cancelled".equals(status))) {
+                throw new IllegalStateException("请等待失败或取消的任务完全结束后再补做");
+            }
+            if (ledger.hasUnknown() && !retryUnknown) {
+                throw new IllegalStateException("结果不明的请求可能已扣费，请先核对并明确确认重新请求");
+            }
+            List<Integer> remaining = ledger.remaining(retryUnknown);
+            if (remaining.isEmpty()) {
+                throw new IllegalStateException(ledger.hasUnknown()
+                    ? "结果不明的请求可能已扣费，请先核对并明确确认重新请求"
+                    : "图片已经生成，无需重复生图；后处理失败请从图库处理原图");
+            }
+            JSONArray original = stored.optJSONArray("units");
+            for (Integer index : remaining) {
+                JSONObject unit = new JSONObject(original.getJSONObject(index).toString());
+                selected.add(unit); // Preserve page_index, copy_index and the original seed offset.
+                pages.put(unit);
+            }
+            job.put("retry_in_progress", true);
         }
-        cancelled.remove(id);
-        JSONObject comment = stored.optJSONObject("comment");
-        JSONObject source = stored.optJSONObject("source");
-        boolean forceFree = stored.optBoolean("force_free", true);
-        int total = Math.max(1, stored.optInt("copies", 1));
-        JSONArray pages = stored.optJSONArray("pages");
-        JSONObject started = (pages != null && pages.length() > 0)
-            ? startPages(pages, forceFree, total, source)
-            : start(comment, forceFree, total, source);
-        started.put("retried_from", id);
-        started.put("message", "unknown".equals(status)
-            ? "已重新入队。上次结果不明，可能已扣费，请先看 NovelAI 记录再决定要不要留这张"
-            : "已重新入队");
-        return started;
+        // Do not hold a job lock while enqueueing: list() locks order then jobs.
+        try {
+            JSONObject started = enqueueUnits(selected, pages, stored.optBoolean("force_free", true),
+                1, stored.optJSONObject("source"));
+            synchronized (job) {
+                job.put("retry_task_id", started.getString("task_id"));
+                job.put("retryable", false);
+            }
+            started.put("retried_from", id);
+            started.put("message", "已补做 " + selected.size() + " 张，已生成的图片不会重复请求");
+            return started;
+        } finally {
+            synchronized (job) { job.remove("retry_in_progress"); }
+        }
     }
 
     JSONObject delete(String taskId) throws Exception {
@@ -253,6 +296,7 @@ final class JobStore {
         cancelled.add(id);
         jobs.remove(id);
         payloads.remove(id);
+        ledgers.remove(id);
         synchronized (order) {
             order.remove(id);
         }
@@ -266,6 +310,10 @@ final class JobStore {
     private void run(String id, List<JSONObject> units, boolean forceFree, JSONObject source) {
         JSONObject job = jobs.get(id);
         if (job == null) return;
+        synchronized (job) {
+            if (cancelled.contains(id)) return;
+        }
+        final RetryLedger ledger = ledgers.get(id);
         final int total = units.size();
         JSONArray collected = new JSONArray();
         AtomicInteger finished = new AtomicInteger(0);
@@ -305,9 +353,11 @@ final class JobStore {
                         bumpRunning(job, 1);
                         charged = true;
                         markStage(job, "generating", "正在出图");
-                        byte[] png = generator.generatePng(page, forceFree);
+                        ledger.requested(index);
+                        byte[] png = generator.generatePng(page, forceFree, () -> cancelled.contains(id));
                         markStage(job, "saving", "先写入图库");
                         String imageId = images.save(id + "p" + index, png, false);
+                        ledger.generated(index);
                         String imageUrl = "/api/mobile/output/" + imageId + ".png";
                         if (catalog != null) catalog.add(imageId, source);
                         if (gallery != null) gallery.addImage(id, imageId, imageUrl, source);
@@ -367,6 +417,7 @@ final class JobStore {
                             }
                         }
                     } catch (NaiGenerator.NaiError error) {
+                        ledger.failed(index, error.billingUncertain);
                         lastError.set(error);
                         if (error.billingUncertain) {
                             unknown.set(error);
@@ -383,6 +434,8 @@ final class JobStore {
                             } catch (Exception ignored) {}
                         }
                     } catch (Exception error) {
+                        // A saved original remains generated even if later processing fails.
+                        ledger.failed(index, charged);
                         lastError.set(error);
                         synchronized (job) {
                             JSONObject item = new JSONObject();
@@ -419,7 +472,7 @@ final class JobStore {
             }
             Exception error = lastError.get();
             if (error != null && finished.get() < total) {
-                fail(job, friendlyGenerateError(error.getMessage()), false, collected);
+                fail(job, friendlyGenerateError(error.getMessage()), ledger.hasUnknown(), collected);
                 return;
             }
             synchronized (job) {
