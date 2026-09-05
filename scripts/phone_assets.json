@@ -55,6 +55,12 @@
       "sha": "c4a052719f25a5b454d85a78cd164d458fb7f698",
       "size": 222270,
       "optional": false
+    },
+    {
+      "path": "android/app/src/main/res/drawable/ic_splash.png",
+      "sha": "d8fbdfc330615b774e0163f16175232e6c45ea41",
+      "size": 204973,
+      "optional": false
     }
   ]
 }

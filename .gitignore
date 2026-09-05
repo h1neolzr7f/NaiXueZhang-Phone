@@ -86,3 +86,4 @@ __pycache__/
 /data/phone_char_index.txt
 /data/phone_copyright_index.txt
 /data/tag_dict.json
+/android/app/src/main/res/drawable/ic_splash.png

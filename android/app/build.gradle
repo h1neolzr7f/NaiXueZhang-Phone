@@ -44,7 +44,8 @@ tasks.register("syncPhoneAssets") {
     doLast {
         def required = ["web/m/index.html", "web/m/m.js", "web/m/m.css",
             "web/m/standalone-core.js", "web/shared/api-client.js", "data/phone_char_index.txt",
-            "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"]
+            "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+            "android/app/src/main/res/drawable/ic_splash.png"]
         def missing = required.findAll { !new File(repoRoot, it).isFile() }
         if (!missing.isEmpty()) {
             throw new GradleException("Missing phone assets: " + missing.join(", ")
