@@ -29,3 +29,11 @@ The Android launcher artwork and `censor.onnx` are also not included. The test s
 ## Limits
 
 This was not an Android Gradle build, emulator/device test, APK installation test, OCR/censorship-model test or paid generation test. Because the public branch is phone.16 and the distributed APK is phone.23, this repository does not currently provide a reproducible build of that APK. No screenshot is published for this source profile: the complete UI bundle is not present, and using the private packaging copy would misrepresent what a public checkout can run.
+
+
+## 2026-09-05 修复分支补充
+
+上文记录保留为历史基线。当前分支恢复了匹配 phone.16 的 `web/m/m.js`，
+并提供 `scripts/restore_phone_assets.py --model` 恢复并校验公开构建依赖。
+UI 契约测试不再因缺少 m.js 而跳过；CI 增加实际 Java 队列测试和 Android assembleDebug。
+这仍不是对已发布 phone.23 APK 的复现、实机验收或付费生图验证。

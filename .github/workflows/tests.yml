@@ -16,7 +16,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Restore pinned public build assets
+        run: python3 scripts/restore_phone_assets.py --model
       - name: Phone shell contract
         run: node tests/standalone_core_test.js
       - name: Android standalone contract
         run: python3 tests/test_mobile_standalone.py
+      - name: Queue recovery with the production Java scheduler
+        run: python3 scripts/test_phone_retry.py
+      - name: Compile Android source APK
+        working-directory: android
+        run: bash gradlew --no-daemon assembleDebug

@@ -74,3 +74,15 @@ __pycache__/
 
 # Local scratch
 .tmp/
+
+
+# Restored from the pinned manifest; do not duplicate large build assets in Git.
+/android/app/src/main/assets/censor.onnx
+/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+/android/gradle/wrapper/gradle-wrapper.jar
+/data/ark_char_library.json
+/data/char_tag_index.json
+/data/danbooru_creature.json
+/data/phone_char_index.txt
+/data/phone_copyright_index.txt
+/data/tag_dict.json

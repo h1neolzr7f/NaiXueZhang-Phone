@@ -1,0 +1,60 @@
+{
+  "repository": "h1neolzr7f/NaiXueZhang-Studio-Upgrade",
+  "ref": "3d076cc0cbdef6d95972a2d18166da548526550c",
+  "files": [
+    {
+      "path": "android/app/src/main/assets/censor.onnx",
+      "sha": "578198237133e97c8be7e7e88a837c9feccd87f5",
+      "size": 44722357,
+      "optional": true
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "sha": "aa8279d2f8f37a1223e2599f6853cc414ee4a185",
+      "size": 82470,
+      "optional": false
+    },
+    {
+      "path": "android/gradle/wrapper/gradle-wrapper.jar",
+      "sha": "a4b76b9530d66f5e68d973ea569d8e19de379189",
+      "size": 43583,
+      "optional": false
+    },
+    {
+      "path": "data/ark_char_library.json",
+      "sha": "561790eeb193e4e057ec48bc82ed62d10186009f",
+      "size": 626836,
+      "optional": false
+    },
+    {
+      "path": "data/char_tag_index.json",
+      "sha": "3264a5e1bc669e0f95fe973576758939ffb93cf6",
+      "size": 11039317,
+      "optional": false
+    },
+    {
+      "path": "data/danbooru_creature.json",
+      "sha": "fb4c9820682e22513a304b43625bd61a842ae519",
+      "size": 255331,
+      "optional": false
+    },
+    {
+      "path": "data/phone_char_index.txt",
+      "sha": "fdb92f93d8f4d0e8b0db59a0bb050569e23d114c",
+      "size": 6761946,
+      "optional": false
+    },
+    {
+      "path": "data/phone_copyright_index.txt",
+      "sha": "70f3d19dc2360c1360f82595134e0d8b18b50cdf",
+      "size": 1265751,
+      "optional": false
+    },
+    {
+      "path": "data/tag_dict.json",
+      "sha": "c4a052719f25a5b454d85a78cd164d458fb7f698",
+      "size": 222270,
+      "optional": false
+    }
+  ]
+}

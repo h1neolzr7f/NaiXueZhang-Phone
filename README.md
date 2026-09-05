@@ -25,18 +25,20 @@ data/      可公开的角色和标签索引子集
 tests/     JavaScript 与 Android 源码契约
 ```
 
-当前公开快照不包含签名文件、真实凭据、用户数据，也不包含发行包中的全部大型运行资源。它适合代码审阅和契约测试；不能据此声称可逐字节复现 phone.23 APK。
+源码不包含签名文件、真实凭据或用户数据。大型运行资源通过下方固定版本清单恢复，可构建修复后的 phone.16 debug 包；不能据此声称可逐字节复现 phone.23 APK。
 
 ## 验证
 
-CI 的公开源码档位运行：
+CI 恢复并校验构建资源后运行：
 
 ```bash
 node tests/standalone_core_test.js
 python3 tests/test_mobile_standalone.py
+python3 scripts/test_phone_retry.py
+# Android 构建另执行 assembleDebug
 ```
 
-不需要真实 NovelAI Token，也不会调用付费生成。只在发行工作区存在的大型索引、模型和预览工具会被明确跳过；APK 发布前还需在 Android 构建环境做完整验证。
+不需要真实 NovelAI Token，也不会调用付费生成。界面、索引、模型与 Android 构建不再跳过；缺少桌面预览服务时仅该服务的测试明确跳过。发布前仍需实机和安装升级验证。
 
 ## 安装包
 
@@ -57,3 +59,33 @@ python3 tests/test_mobile_standalone.py
 不要在 Issue、日志或截图中提交 NovelAI Token、第三方 API Key、Cookie、签名文件或私人图库。详见 [SECURITY.md](SECURITY.md)、[RESPONSIBLE_USE.md](RESPONSIBLE_USE.md) 和 [DISCLAIMER.md](DISCLAIMER.md)。
 
 代码采用 [MIT License](LICENSE)。项目与 pixiv Inc.、NovelAI/Anlatan、AITag、DeepSeek 或其他第三方服务没有隶属、授权或合作关系。
+
+
+## 源码修复与构建（2026-09-05）
+
+本修复分支以 `1.5.2-phone.16` 源码为基线，不代表已有 `phone.23` 安装包包含这些修复。
+`web/m/m.js` 已从同一开发线的固定提交 `3d076cc0cbdef6d95972a2d18166da548526550c` 恢复。
+缺失的公开词库、启动图标、Gradle wrapper 和 ONNX 模型可按固定清单恢复，每个文件均校验 Git blob SHA 与大小。
+
+需要 Python 3、Java 17 JDK 和 Android SDK 34：
+
+```sh
+python scripts/restore_phone_assets.py --model
+node tests/standalone_core_test.js
+python tests/test_mobile_standalone.py
+python scripts/test_phone_retry.py
+cd android
+# Windows 使用 gradlew.bat assembleDebug
+bash gradlew --no-daemon assembleDebug
+```
+
+恢复的依赖来自上述公开提交，不包含账号、Token 或个人图库。大文件不会重复提交到本仓库。
+构建产物是源码验证用的 debug APK；未使用正式发布签名，也不替代已发布的 phone.23。
+
+队列的“补做未完成”保留每页每份的原始 seed 偏移，跳过已保存的图片；
+重复点击同一父任务只返回已建立的补做任务。后处理失败不会再次请求已生成的原图。
+结果不明的请求需核对平台记录并在界面明确确认，API 也要求 `retry_unknown: true`。
+取消后要等待已发出的请求结束；仍在等待 Token 的请求会在发送前检查取消标记。
+
+CI 现在包含资源恢复、实际 Java 队列故障场景和 Android 构建。
+桌面预览服务不属于 Android 运行资源，相应测试在该服务未提供时仍明确跳过。

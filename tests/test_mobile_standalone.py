@@ -119,10 +119,6 @@ class MobileStandaloneTests(unittest.TestCase):
         self.assertIn("showVerify", browser)
         self.assertIn("NaiPipe", browser)
 
-    @unittest.skipUnless(
-        (WEB / "m" / "m.js").is_file(),
-        "distribution UI bundle is not included in the public source profile",
-    )
     def test_web_shell_has_standalone_mode(self) -> None:
         js = (WEB / "m" / "m.js").read_text(encoding="utf-8")
         self.assertIsNone(re.search(r"\bfetch\s*\(", js))
